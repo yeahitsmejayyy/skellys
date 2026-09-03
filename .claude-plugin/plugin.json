@@ -1,0 +1,20 @@
+{
+  "name": "skellys",
+  "displayName": "skellys",
+  "version": "0.1.0",
+  "description": "Scaffold a new project from a Skelly boilerplate template — clone, cut loose, and rename, without mangling the parts that are deliberately still Skelly.",
+  "author": {
+    "name": "PJ Bell",
+    "url": "https://github.com/yeahitsmejayyy"
+  },
+  "homepage": "https://github.com/yeahitsmejayyy/skellys",
+  "repository": "https://github.com/yeahitsmejayyy/skellys",
+  "license": "MIT",
+  "keywords": [
+    "boilerplate",
+    "scaffold",
+    "template",
+    "starter",
+    "skelly"
+  ]
+}

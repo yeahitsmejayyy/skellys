@@ -1,0 +1,24 @@
+{
+  "name": "skellys",
+  "description": "skellys — scaffold new projects from the Skelly boilerplate templates.",
+  "owner": {
+    "name": "PJ Bell",
+    "url": "https://github.com/yeahitsmejayyy"
+  },
+  "plugins": [
+    {
+      "name": "skellys",
+      "source": "./",
+      "description": "Scaffold a new project from a Skelly boilerplate template — clone, cut loose, and rename, without mangling the parts that are deliberately still Skelly.",
+      "version": "0.1.0",
+      "license": "MIT",
+      "keywords": [
+        "boilerplate",
+        "scaffold",
+        "template",
+        "starter",
+        "skelly"
+      ]
+    }
+  ]
+}
