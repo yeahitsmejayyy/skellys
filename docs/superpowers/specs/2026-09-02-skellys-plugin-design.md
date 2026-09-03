@@ -57,7 +57,7 @@ Install path for users:
 
 ```
 /plugin marketplace add yeahitsmejayyy/skellys
-/plugin install skelly@skellys
+/plugin install skellys@skellys
 ```
 
 ### `templates.json`
@@ -187,8 +187,9 @@ ever needs a genuine build step.
 
 ## Error handling
 
-- **Clone fails** (network, renamed repo, rate limit): report the failing template and stop.
-  Do not leave a half-scaffolded root.
+- **Clone fails** (network, renamed repo, rate limit): report the failing template and stop. Do
+  not attempt the remaining templates, and do not delete what already landed — the project root
+  may be a directory the user already had.
 - **Target directory exists and is non-empty**: stop and ask. Never overwrite.
 - **A `rename` entry's file is missing, or `from` is not found**: warn, continue, and include it
   in the final report. This means the upstream template drifted from the manifest; a partial

@@ -51,7 +51,7 @@ Deliverable: the repo is a valid Claude Code plugin marketplace that installs lo
 - [ ] **Step 1: Initialize the repository**
 
 ```bash
-cd /Users/yeahitsmejayyy/Documents/Development/2026/_skills/mine/skellys
+cd <repo root>
 git init
 ```
 
@@ -222,7 +222,7 @@ Expected:
 In an interactive Claude Code session:
 
 ```
-/plugin marketplace add /Users/yeahitsmejayyy/Documents/Development/2026/_skills/mine/skellys
+/plugin marketplace add <repo root>
 ```
 
 Expected: the marketplace `skellys` is added and lists one plugin, `skellys`. It has no skills

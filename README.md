@@ -41,10 +41,25 @@ Each template ships demo content — a landing page, an example schema. That sta
 reference implementation the boilerplate exists to provide, and the skill reports exactly what
 is left so nothing Skelly-flavored reaches production by accident.
 
+`LICENSE` is not renamed either — it is deleted, so the scaffolded project is your own and does
+not ship someone else's copyright line. The templates are MIT, and for projects scaffolded by
+this plugin the author waives the notice-retention requirement: add your own licence, or none.
+
 ## Adding a template
 
 One object in `skills/skelly/templates.json`. No prose changes. Run
 `node scripts/verify-manifest.mjs` afterwards.
+
+| field | what it holds |
+|---|---|
+| `id` | the name the user selects the template by. Unique across the manifest. |
+| `repo` | the clone URL. |
+| `dir` | the child directory under the project root. Unique across the manifest. |
+| `summary` | one line, used when offering templates and in the generated stub README. |
+| `run` | the command that starts it, quoted verbatim into the stub README. |
+| `rename` | array of `{ file, from, to }`. File-scoped, never global; `to` may contain `{{slug}}`. |
+| `purge` | array of paths deleted at scaffold time. |
+| `demo` | array of `{ path, note }`. Deliberately kept; the `note` is read out to the user. |
 
 ## License
 
