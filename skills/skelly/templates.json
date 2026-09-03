@@ -1,0 +1,57 @@
+{
+  "templates": [
+    {
+      "id": "backend",
+      "repo": "https://github.com/yeahitsmejayyy/skelly-backend",
+      "dir": "backend",
+      "summary": "Local-first Bun + SQLite backend. tRPC by default, REST as the escape hatch.",
+      "rename": [
+        { "file": "package.json", "from": "@skelly/backend", "to": "@{{slug}}/backend" },
+        { "file": "src/db/client.ts", "from": "skelly.db", "to": "{{slug}}.db" },
+        { "file": "src/db/client.ts", "from": "@skelly/backend", "to": "@{{slug}}/backend" },
+        { "file": "src/routes/healthCheck.ts", "from": "skelly backend", "to": "{{slug}} backend" }
+      ],
+      "purge": ["README.md", "SECURITY.md", "image.png"],
+      "demo": [
+        {
+          "path": "src/db/schema.sql",
+          "note": "Ships an EXAMPLE TABLE `skelly_meta` and a Skelly header comment. Reference material — replace it when you write your real schema."
+        }
+      ]
+    },
+    {
+      "id": "admin",
+      "repo": "https://github.com/yeahitsmejayyy/skelly-admin",
+      "dir": "admin",
+      "summary": "Vite + React admin portal. Talks to the backend over tRPC.",
+      "rename": [
+        { "file": "package.json", "from": "@skelly/frontend", "to": "@{{slug}}/admin" },
+        { "file": "index.html", "from": "@skelly/admin", "to": "@{{slug}}/admin" },
+        { "file": "src/components/layout/app-nav.tsx", "from": "skelly-admin", "to": "{{slug}}-admin" }
+      ],
+      "purge": ["README.md", "SECURITY.md", "image.png"],
+      "demo": []
+    },
+    {
+      "id": "site",
+      "repo": "https://github.com/yeahitsmejayyy/skelly-site",
+      "dir": "site",
+      "summary": "Vite + React marketing site skeleton.",
+      "rename": [
+        { "file": "package.json", "from": "@skelly/site", "to": "@{{slug}}/site" },
+        { "file": "src/components/default.tsx", "from": "skelly-site", "to": "{{slug}}-site" }
+      ],
+      "purge": ["README.md", "SECURITY.md", "image.png"],
+      "demo": [
+        {
+          "path": "src/seo/seo-defaults.tsx",
+          "note": "Ships Skelly's meta description. MUST be edited before shipping — this is what search engines index."
+        },
+        {
+          "path": "src/routes/home.tsx",
+          "note": "~590 lines of Skelly marketing copy, including a `Copyright 2026 skellyui.com` footer. This is the demo landing page you hack on."
+        }
+      ]
+    }
+  ]
+}
