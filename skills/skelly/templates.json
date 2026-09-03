@@ -39,7 +39,8 @@
       "summary": "Vite + React marketing site skeleton.",
       "rename": [
         { "file": "package.json", "from": "@skelly/site", "to": "@{{slug}}/site" },
-        { "file": "src/components/default.tsx", "from": "skelly-site", "to": "{{slug}}-site" }
+        { "file": "src/components/default.tsx", "from": "skelly-site", "to": "{{slug}}-site" },
+        { "file": "bun.lock", "from": "\"name\": \"skelly-site\"", "to": "\"name\": \"@{{slug}}/site\"" }
       ],
       "purge": ["README.md", "SECURITY.md", "image.png"],
       "demo": [
