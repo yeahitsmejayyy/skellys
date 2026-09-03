@@ -85,7 +85,7 @@ For each selected template, in order:
    own search tool — this step adds no dependency.
 6. Write `<slug>/<dir>/README.md`: the project name as the heading, the template's `summary` as
    one line of description, and the template's `run` value verbatim as the command to start it.
-   Do not invent a command — step 3 deleted the upstream README that would have told you, and
+   Do not invent a command — step 2.3 deleted the upstream README that would have told you, and
    `run` is there precisely so you do not have to guess.
 
 If a clone fails, report which template failed and stop. Do not attempt the remaining templates.

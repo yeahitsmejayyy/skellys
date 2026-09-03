@@ -13,20 +13,45 @@ import { execFileSync } from "node:child_process";
 import { join, relative } from "node:path";
 import { tmpdir } from "node:os";
 
-const manifest = JSON.parse(
-  readFileSync(new URL("../skills/skelly/templates.json", import.meta.url), "utf8")
-);
+const manifestPath = new URL("../skills/skelly/templates.json", import.meta.url);
+let manifest;
+try {
+  manifest = JSON.parse(readFileSync(manifestPath, "utf8"));
+} catch (err) {
+  console.error(`templates.json is not valid JSON: ${err.message}`);
+  process.exit(1);
+}
 
 // The author's identity in these repos is not coextensive with the string
-// "skelly" — the GitHub handle carries it too, and grepping only the one token
-// leaves the other class invisible. Both patterns feed the same accounting.
-const IDENTITY_PATTERNS = ["skelly", "yeahitsmejayyy"];
-const IDENTITY_RE = new RegExp(IDENTITY_PATTERNS.join("|"), "i");
+// "skelly" — the GitHub handle carries it too, and neither spells out the
+// email that also identifies the author, so all three patterns feed the same
+// accounting.
+const IDENTITY_PATTERNS = ["skelly", "yeahitsmejayyy", "itsjayyy"];
+// Patterns are also fed to `grep -e` as POSIX BREs (see findIdentityFiles),
+// so a pattern containing a JS/BRE metacharacter would mean two different
+// things to the two consumers. Escaping here only protects the JS RegExp
+// side; today's patterns are plain alphanumerics so this is a no-op, but it
+// keeps the documented extension point from silently over-matching the day
+// someone adds a pattern with `.`, `+`, `?`, or `|` in it.
+const escapeRegExp = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+const IDENTITY_RE = new RegExp(IDENTITY_PATTERNS.map(escapeRegExp).join("|"), "i");
 
 // Used only to resolve {{slug}} in `to` (and, defensively, `from`) values when
 // simulating a rename in memory. Never written to disk.
 const DUMMY_SLUG = "dummy-slug";
 const fillSlug = (s) => s.split("{{slug}}").join(DUMMY_SLUG);
+
+// A purge entry written "src/" matches neither branch of `covered()` below:
+// the exact-match test wants "src", and the prefix test builds "src//" which
+// never matches a real relative path. Normalize at ingest so a trailing
+// slash is never load-bearing.
+if (Array.isArray(manifest.templates)) {
+  for (const t of manifest.templates) {
+    if (t && Array.isArray(t.purge)) {
+      t.purge = t.purge.map((p) => (typeof p === "string" ? p.replace(/\/+$/, "") : p));
+    }
+  }
+}
 
 // --- structural validation -------------------------------------------------
 // "One object in templates.json" is the documented extension point, so a
@@ -97,10 +122,25 @@ function validateManifest(m) {
     }
 
     if (Array.isArray(t.rename) && Array.isArray(t.purge)) {
-      const purged = new Set(t.purge.filter((p) => typeof p === "string"));
+      const purgeEntries = t.purge.filter((p) => typeof p === "string");
+      const purged = new Set(purgeEntries);
       for (const r of t.rename) {
-        if (r && typeof r.file === "string" && purged.has(r.file)) {
+        if (!r || typeof r.file !== "string") continue;
+        if (purged.has(r.file)) {
           errors.push(`${where}: "${r.file}" is listed in both rename and purge`);
+          continue;
+        }
+        // `covered()` in the upstream check treats a purge entry as a
+        // directory prefix, so a rename target that merely lives UNDER a
+        // purged directory is just as much a collision as an exact-path
+        // match — it will be deleted before the rename can ever run, and
+        // would otherwise pass every identity check as "accounted for"
+        // without being examined.
+        const nestingPurgeDir = purgeEntries.find((p) => r.file.startsWith(`${p}/`));
+        if (nestingPurgeDir) {
+          errors.push(
+            `${where}: rename file "${r.file}" is inside purged directory "${nestingPurgeDir}"`
+          );
         }
       }
     }

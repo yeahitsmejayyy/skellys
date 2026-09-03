@@ -32,9 +32,10 @@
         { "file": "src/components/layout/app-nav.tsx", "from": "skelly-admin", "to": "{{slug}}-admin" },
         { "file": "src/components/layout/app-nav.tsx", "from": "username=\"yeahitsmejayyy\"", "to": "username=\"{{slug}}\"" },
         { "file": "src/components/layout/app-nav.tsx", "from": "email=\"hello@itsjayyy.com\"", "to": "email=\"you@example.com\"" },
+        { "file": "src/components/layout/app-nav.tsx", "from": "avatarSrc=\"/avatar.png\"", "to": "avatarSrc=\"\"" },
         { "file": "src/lib/trpc.ts", "from": "../../../skelly-backend/src/appRouter", "to": "../../../backend/src/appRouter" }
       ],
-      "purge": ["README.md", "SECURITY.md", "image.png", "LICENSE"],
+      "purge": ["README.md", "SECURITY.md", "image.png", "LICENSE", "public/avatar.png"],
       "demo": []
     },
     {
