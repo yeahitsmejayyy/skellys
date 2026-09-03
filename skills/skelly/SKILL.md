@@ -37,6 +37,10 @@ Read `templates.json` (next to this file) for the available template ids and the
 Ask for the project name if it was not given. Ask which templates if it was not clear — offer
 the ids with their summaries.
 
+If `admin` is selected without `backend`, tell the user first: admin's tRPC types import from a
+sibling `backend/` directory, so `bun run typecheck` will fail until a backend is scaffolded
+alongside it. Proceed if they still want it.
+
 Derive `slug`: the project name, lowercased and kebab-cased. "Acme Widgets" becomes
 `acme-widgets`. This is the only derived value and it fills every `{{slug}}` in the manifest.
 Ask only if the derivation is genuinely ambiguous.

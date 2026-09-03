@@ -27,7 +27,8 @@
       "rename": [
         { "file": "package.json", "from": "@skelly/frontend", "to": "@{{slug}}/admin" },
         { "file": "index.html", "from": "@skelly/admin", "to": "@{{slug}}/admin" },
-        { "file": "src/components/layout/app-nav.tsx", "from": "skelly-admin", "to": "{{slug}}-admin" }
+        { "file": "src/components/layout/app-nav.tsx", "from": "skelly-admin", "to": "{{slug}}-admin" },
+        { "file": "src/lib/trpc.ts", "from": "../../../skelly-backend/src/appRouter", "to": "../../../backend/src/appRouter" }
       ],
       "purge": ["README.md", "SECURITY.md", "image.png"],
       "demo": []
