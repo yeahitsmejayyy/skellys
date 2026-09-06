@@ -20,11 +20,31 @@ for f in "$REPO"/skills/*/SKILL.md; do
   [ "$lines" -le 150 ] || { echo "✗ $dir: $lines lines (keep it under 150)"; fail=1; }
 done
 
+# Each skill ships a scaffold.json beside its SKILL.md; both must travel together.
+for d in "$REPO"/skills/*/; do
+  name="$(basename "$d")"
+  [ -f "$d/scaffold.json" ] || { echo "✗ $name: no scaffold.json"; fail=1; }
+done
+
+# The rename/purge/demo manifests against the live upstream repos. This is the drift guard:
+# a template that grows a new identity token fails here rather than in someone's scaffold.
+if command -v node >/dev/null 2>&1; then
+  if node "$REPO/scripts/verify-manifest.mjs" >/dev/null 2>&1; then
+    echo "✓ manifests match upstream"
+  else
+    echo "✗ manifests drifted from upstream — run: node scripts/verify-manifest.mjs"; fail=1
+  fi
+else
+  echo "· node not found, skipping the manifest drift check"
+fi
+
 # The four agents the landing page offers.
 for agent in claude-code cursor codex hermes-agent; do
   d="$TMP/$agent"; mkdir -p "$d"
   ( cd "$d" && npx -y skills@latest add "$REPO" -a "$agent" -y >/dev/null 2>&1 )
   n="$(find "$d" -name SKILL.md | wc -l | tr -d ' ')"
+  m="$(find "$d" -name scaffold.json | wc -l | tr -d ' ')"
+  [ "$m" = "3" ] || { echo "✗ $agent: $m scaffold.json files installed, expected 3"; fail=1; }
   where="$(find "$d" -name SKILL.md -print -quit | sed "s|$d/||;s|/[^/]*/SKILL.md||")"
   if [ "$n" = "3" ]; then echo "✓ $agent -> $where"; else echo "✗ $agent: found $n skills, expected 3"; fail=1; fi
 done

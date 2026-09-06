@@ -1,0 +1,22 @@
+{
+  "id": "backend",
+  "repo": "https://github.com/yeahitsmejayyy/skelly-backend",
+  "dir": "backend",
+  "summary": "Local-first Bun + SQLite backend, typed end to end with tRPC.",
+  "run": "bun install && bun run dev",
+  "rename": [
+    { "file": "package.json", "from": "@skelly/backend", "to": "@{{slug}}/backend" },
+    { "file": "src/db/client.ts", "from": "skelly.db", "to": "{{slug}}.db" },
+    { "file": "src/db/client.ts", "from": "@skelly/backend", "to": "@{{slug}}/backend" },
+    { "file": "src/routes/healthCheck.ts", "from": "skelly backend", "to": "{{slug}} backend" },
+    { "file": "src/trpc.ts", "from": "skelly-admin", "to": "the admin" },
+    { "file": "scripts/emit-types.ts", "from": "skelly-admin", "to": "the admin" }
+  ],
+  "purge": ["README.md", "SECURITY.md", "ARCHITECTURE.md", "image.png", "LICENSE"],
+  "demo": [
+    {
+      "path": "src/db/schema.sql",
+      "note": "Ships an EXAMPLE TABLE `skelly_meta` and a Skelly header comment. Reference material - replace it when you write your real schema."
+    }
+  ]
+}

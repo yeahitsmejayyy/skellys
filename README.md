@@ -41,10 +41,15 @@ npx skills add yeahitsmejayyy/skellys -a hermes-agent
 | [`skelly-site`](./skills/skelly-site/SKILL.md) | a marketing site | React · Vite · Tailwind · shadcn/ui |
 
 Ask for one in your own words — *"start me a backend for a notes app"* — and the skill clones
-the template, detaches it from Skelly's history so the repo is yours from the first commit,
-proves it runs, and then builds your first real feature on it.
+the template, renames it to your project, strips out everything that was about Skelly rather
+than about you, proves it runs, and then builds your first real feature on it.
 
 You end up holding a working feature, not an empty folder.
+
+Renaming is done from a checked manifest, never a find-and-replace: package names and the
+database filename are renamed, Skelly's own docs and licence are deleted, and the demo content
+you are meant to hack on is left alone and reported to you so nothing Skelly-flavoured reaches
+production by accident.
 
 ---
 
@@ -53,14 +58,15 @@ You end up holding a working feature, not an empty folder.
 Cloned side by side in one product folder, they wire together:
 
 ```
-your-product/
-├─ skelly-backend/     exports its router type
-├─ skelly-admin/       typed against it, builds standalone
-└─ skelly-site/        independent
+acme-widgets/
+├─ backend/     exports its router type
+├─ admin/       typed against it, builds standalone
+└─ site/        independent
 ```
 
 `bun run sync:types` in the admin refreshes the contract when the backend's router changes.
-Keep the folder names and it just works. Each is also fine alone — take the one you need.
+Scaffold them under one project root and it just works. Each is also fine alone — take the one
+you need.
 
 ---
 
@@ -80,9 +86,12 @@ Skills run with your agent's permissions, so read one before you install it — 
 hundred lines. Then:
 
 ```bash
-./scripts/check.sh          # install checks, no model, seconds
-./scripts/e2e.sh backend    # one real agent run; spends usage
+./scripts/check.sh                    # install checks + manifest drift guard; seconds
+node scripts/verify-manifest.mjs      # the manifests against the live templates
+./scripts/e2e.sh backend              # one real agent run; spends usage
 ```
+
+Adding a template is one `scaffold.json` beside a new `SKILL.md`, then the guard.
 
 [ARCHITECTURE.md](./ARCHITECTURE.md) explains why the repository is shaped this way and what
 each part of a `SKILL.md` is for. [SECURITY.md](./SECURITY.md) sets out exactly what these

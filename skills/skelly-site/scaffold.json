@@ -1,0 +1,23 @@
+{
+  "id": "site",
+  "repo": "https://github.com/yeahitsmejayyy/skelly-site",
+  "dir": "site",
+  "summary": "Vite + React marketing site skeleton, fourteen sections behind a typed registry.",
+  "run": "bun install && bun run dev",
+  "rename": [
+    { "file": "package.json", "from": "@skelly/site", "to": "@{{slug}}/site" },
+    { "file": "src/components/default.tsx", "from": "skelly-site", "to": "{{slug}}-site" },
+    { "file": "bun.lock", "from": "\"name\": \"skelly-site\"", "to": "\"name\": \"@{{slug}}/site\"" }
+  ],
+  "purge": ["README.md", "SECURITY.md", "ARCHITECTURE.md", "image.png", "LICENSE"],
+  "demo": [
+    {
+      "path": "src/seo/seo-defaults.tsx",
+      "note": "Ships Skelly's meta description. MUST be edited before shipping - this is what search engines index."
+    },
+    {
+      "path": "src/routes/home.tsx",
+      "note": "~590 lines of Skelly marketing copy, including a `Copyright 2026 skellyui.com` footer. This is the demo landing page you hack on."
+    }
+  ]
+}

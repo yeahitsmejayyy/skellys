@@ -10,8 +10,8 @@ set -euo pipefail
 
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 case "${1:-}" in
-  backend) PROMPT="Start me a backend for a notes app. I need to be able to list and create notes." ;;
-  admin)   PROMPT="Start me an admin dashboard for my product. It needs a Notes page." ;;
+  backend) PROMPT="Start me a backend for a project called Acme Widgets. It is a notes app - I need to list and create notes." ;;
+  admin)   PROMPT="Start me an admin dashboard for a project called Acme Widgets. It needs a Notes page." ;;
   site)    PROMPT="Start me a marketing site for Beacon, an uptime monitoring tool. Real hero and pricing copy, and put social proof above pricing." ;;
   *) echo "usage: $0 backend|admin|site"; exit 2 ;;
 esac
@@ -29,11 +29,14 @@ check() { if eval "$2" >/dev/null 2>&1; then echo "✓ $1"; else echo "✗ $1"; 
 
 case "$1" in
   backend)
-    check "cloned into skelly-backend/"      "[ -d skelly-backend/src ]"
-    check "history is the user's, not Skelly's" "[ \"\$(git -C skelly-backend rev-list --count HEAD)\" = 1 ]"
-    check "notes table in schema.sql"        "grep -qi 'notes' skelly-backend/src/db/schema.sql"
-    check "notes mounted in appRouter"       "grep -qi 'notes' skelly-backend/src/appRouter.ts"
-    ( cd skelly-backend && bun run dev >/tmp/e2e-server.log 2>&1 & echo $! > /tmp/e2e.pid )
+    check "scaffolded to acme-widgets/backend/"   "[ -d acme-widgets/backend/src ]"
+    check "package renamed off @skelly"        "! grep -q '@skelly/' acme-widgets/backend/package.json"
+    check "Skelly README purged"               "[ ! -f acme-widgets/backend/SECURITY.md ]"
+    check "LICENSE removed"                    "[ ! -f acme-widgets/backend/LICENSE ]"
+    check "history is the user's, not Skelly's" "[ \"\$(git -C acme-widgets/backend rev-list --count HEAD)\" = 1 ]"
+    check "notes table in schema.sql"        "grep -qi 'notes' acme-widgets/backend/src/db/schema.sql"
+    check "notes mounted in appRouter"       "grep -qi 'notes' acme-widgets/backend/src/appRouter.ts"
+    ( cd acme-widgets/backend && bun run dev >/tmp/e2e-server.log 2>&1 & echo $! > /tmp/e2e.pid )
     # Poll until it is actually listening — a fixed sleep races the boot and fails the next check.
     for _ in $(seq 20); do curl -sf localhost:3001/trpc/health.check >/dev/null 2>&1 && break; sleep 1; done
     check "health.check answers"             "curl -sf localhost:3001/trpc/health.check | grep -q '\"status\"'"
@@ -43,18 +46,18 @@ case "$1" in
     kill "$(cat /tmp/e2e.pid)" 2>/dev/null || true
     ;;
   admin)
-    check "cloned into skelly-admin/"        "[ -d skelly-admin/src ]"
-    check "history is the user's"            "[ \"\$(git -C skelly-admin rev-list --count HEAD)\" = 1 ]"
-    check "notes route registered"           "grep -qi 'notes' skelly-admin/src/App.tsx"
-    check "notes in the sidebar nav"         "grep -qi 'notes' skelly-admin/src/components/layout/app-nav.tsx"
-    check "build passes (typechecks)"        "(cd skelly-admin && bun run build)"
+    check "cloned into acme-widgets/admin/"        "[ -d acme-widgets/admin/src ]"
+    check "history is the user's"            "[ \"\$(git -C acme-widgets/admin rev-list --count HEAD)\" = 1 ]"
+    check "notes route registered"           "grep -qi 'notes' acme-widgets/admin/src/App.tsx"
+    check "notes in the sidebar nav"         "grep -qi 'notes' acme-widgets/admin/src/components/layout/app-nav.tsx"
+    check "build passes (typechecks)"        "(cd acme-widgets/admin && bun run build)"
     ;;
   site)
-    check "cloned into skelly-site/"         "[ -d skelly-site/src ]"
-    check "history is the user's"            "[ \"\$(git -C skelly-site rev-list --count HEAD)\" = 1 ]"
-    check "placeholder hero copy replaced"   "! grep -q 'Hero Section' skelly-site/src/routes/home.tsx"
-    check "social-proof above pricing"       "[ \"\$(grep -n 'social-proof' skelly-site/src/routes/home.tsx | head -1 | cut -d: -f1)\" -lt \"\$(grep -n '\"pricing\"' skelly-site/src/routes/home.tsx | head -1 | cut -d: -f1)\" ]"
-    check "build passes (typechecks)"        "(cd skelly-site && bun run build)"
+    check "cloned into beacon/site/"         "[ -d beacon/site/src ]"
+    check "history is the user's"            "[ \"\$(git -C beacon/site rev-list --count HEAD)\" = 1 ]"
+    check "placeholder hero copy replaced"   "! grep -q 'Hero Section' beacon/site/src/routes/home.tsx"
+    check "social-proof above pricing"       "[ \"\$(grep -n 'social-proof' beacon/site/src/routes/home.tsx | head -1 | cut -d: -f1)\" -lt \"\$(grep -n '\"pricing\"' beacon/site/src/routes/home.tsx | head -1 | cut -d: -f1)\" ]"
+    check "build passes (typechecks)"        "(cd beacon/site && bun run build)"
     ;;
 esac
 

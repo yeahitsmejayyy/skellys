@@ -12,22 +12,50 @@ connected, then build the user's first real page.
 **Do not read the whole tree.** The map below is what you need. Open a file when you are about
 to change it.
 
-## 1. Scaffold
+## Scaffolding: the one thing to get right
 
-Clone into `skelly-admin` inside the user's product folder, detached from Skelly's history:
+`skelly` appears in these repos in three roles, and the author's identity appears in a fourth
+without ever spelling `skelly`. They are not interchangeable. **Never run a global
+find-and-replace on `skelly`** — that is the failure this procedure exists to prevent.
 
-```bash
-git clone --depth 1 https://github.com/yeahitsmejayyy/skelly-admin.git skelly-admin
-cd skelly-admin
-rm -rf .git
-git init -q && git add -A && git commit -qm "Start from a Skelly"
-bun install
-```
+| | What | What to do |
+|---|---|---|
+| **A. Identity tokens** | package names, the db filename, nav labels | rename — `scaffold.json` lists every one, scoped to its file |
+| **B. Files about Skelly** | README, SECURITY, ARCHITECTURE, the banner | delete. Substitute the slug and read it back: if it is not now a true statement about the user's project, it goes |
+| **C. Demo content** | the landing page, the example schema | leave completely alone, and report it. It is the reference implementation the template exists to provide |
+| **D. Author identity** | LICENSE, author metadata | delete or blank, never rename. Substituting a slug into a copyright line transfers a false claim, not ownership |
 
-This repo typechecks and builds on its own — the backend's `AppRouter` type is committed here
-as a generated file. It does not need a backend present to build.
+## Procedure
 
-## 2. Prove it runs
+1. **Project name → slug.** Ask if you were not given one. Lowercase and kebab-case it, then
+   constrain to `[a-z0-9]([a-z0-9-]*[a-z0-9])?`: drop anything outside `[a-z0-9-]`, collapse
+   repeated hyphens, trim the ends. "Acme (US)" becomes `acme-us`. **If nothing survives, stop
+   and ask.** The slug is interpolated into package names and into a literal path, so an
+   unconstrained value is both wrong and unsafe.
+2. **Read `scaffold.json`** next to this file. It holds `dir`, `run`, `rename`, `purge` and
+   `demo`.
+3. **Clone** into `<slug>/<dir>/`, created in the working directory. If that path exists and is
+   non-empty, stop and ask.
+   ```bash
+   git clone --depth 1 <repo> <slug>/<dir>
+   rm -rf <slug>/<dir>/.git
+   ```
+4. **Delete every path in `purge`.**
+5. **Apply every `rename`**, substituting `{{slug}}`, replacing every occurrence of `from` in the
+   file named by `file`. Use your file-editing tools, not `sed` — `sed -i` differs between macOS
+   and Linux. If a file is missing or `from` is not found, warn, keep going, and record it: the
+   template has drifted from the manifest.
+6. **Check for drift the manifest does not know about.** Search the scaffolded directory
+   case-insensitively for `skelly` and `yeahitsmejayyy`, in contents *and* in file and directory
+   names. Subtract the paths listed in `demo` — those are meant to match. Classify anything left
+   with the table above, report it, and say what you would do. Do not fix it silently.
+7. **Write `<slug>/<dir>/README.md`**: the project name as the heading, `summary` as one line,
+   and `run` verbatim as the command to start it. Do not invent the command — step 4 deleted the
+   README that would have told you, which is why `run` exists.
+8. **At the project root, once:** `git init` and `git add -A`. **Do not commit.** Hand the user a
+   one-line commit message as text.
+
+## Prove it runs
 
 ```bash
 bun run dev
@@ -38,9 +66,10 @@ is running on `:3001`, it shows **ok**; if not, it shows **Failed** and that is 
 so rather than debugging it. `/` redirects to `/login`; any email and password gets you in
 (auth is a stub for you to replace).
 
-If there is no backend yet and the user wants one, use the `skelly-backend` skill first.
+If there is no backend yet and the user wants one, use the `skelly-backend` skill first —
+scaffold both under the same project root so `../backend` resolves.
 
-## 3. The map
+## The map
 
 ```
 src/
@@ -66,7 +95,7 @@ src/
 - Scripts: `bun run dev`, `bun run build` (typechecks, then builds), `bun run typecheck`,
   `bun run sync:types`.
 
-## 4. The first change
+## The first change
 
 Whatever the user asked for, in this shape. A Notes page as the example:
 
@@ -85,11 +114,19 @@ If the procedure does not exist on the backend yet, add it there first with the
 
 Commit when it works.
 
+## Report when you finish
+
+- Where it landed, and the command to start it.
+- Every warning from step 5 and every drift hit from step 6.
+- **Every `demo` entry, out loud, with its note.** This is the difference between the user
+  knowing their landing page still advertises Skelly and finding out after they ship.
+- That `LICENSE` was removed, so the project carries no licence until they add one.
+- Offer to run the `run` command. Do not run it unprompted.
 ## Gotchas
 
 - **The backend contract is a snapshot, not a live import.** When the backend's router changes,
-  run `bun run sync:types` here and commit the result. It looks for `../skelly-backend`; set
-  `SKELLY_BACKEND=/path/to/skelly-backend` if it lives elsewhere.
+  run `bun run sync:types` here and commit the result. After scaffolding it looks for
+  `../backend`; set `BACKEND_DIR=/path/to/backend` if it lives elsewhere.
 - **`bun run build` runs `tsc -b` first**, so a type error fails the build. That is the point —
   do not "fix" a red build by skipping the typecheck.
 - **The backend URL is hardcoded** in `main.tsx` (`http://localhost:3001/trpc`). Move it to an
