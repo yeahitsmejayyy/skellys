@@ -33,9 +33,13 @@ case "$1" in
     check "history is the user's, not Skelly's" "[ \"\$(git -C skelly-backend rev-list --count HEAD)\" = 1 ]"
     check "notes table in schema.sql"        "grep -qi 'notes' skelly-backend/src/db/schema.sql"
     check "notes mounted in appRouter"       "grep -qi 'notes' skelly-backend/src/appRouter.ts"
-    ( cd skelly-backend && bun run dev >/tmp/e2e-server.log 2>&1 & echo $! > /tmp/e2e.pid ); sleep 4
+    ( cd skelly-backend && bun run dev >/tmp/e2e-server.log 2>&1 & echo $! > /tmp/e2e.pid )
+    # Poll until it is actually listening — a fixed sleep races the boot and fails the next check.
+    for _ in $(seq 20); do curl -sf localhost:3001/trpc/health.check >/dev/null 2>&1 && break; sleep 1; done
     check "health.check answers"             "curl -sf localhost:3001/trpc/health.check | grep -q '\"status\"'"
     check "notes.list answers"               "curl -sf localhost:3001/trpc/notes.list"
+    check "notes.create writes"              "curl -sf -X POST localhost:3001/trpc/notes.create -H 'content-type: application/json' -d '{\"title\":\"e2e\"}' | grep -q result"
+    check "Zod rejects an empty title"       "[ \"\$(curl -s -o /dev/null -w '%{http_code}' -X POST localhost:3001/trpc/notes.create -H 'content-type: application/json' -d '{\"title\":\"\"}')\" = 400 ]"
     kill "$(cat /tmp/e2e.pid)" 2>/dev/null || true
     ;;
   admin)
