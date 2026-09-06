@@ -47,14 +47,14 @@ case "$1" in
     check "history is the user's"            "[ \"\$(git -C skelly-admin rev-list --count HEAD)\" = 1 ]"
     check "notes route registered"           "grep -qi 'notes' skelly-admin/src/App.tsx"
     check "notes in the sidebar nav"         "grep -qi 'notes' skelly-admin/src/components/layout/app-nav.tsx"
-    check "build passes (typechecks)"        "cd skelly-admin && bun run build"
+    check "build passes (typechecks)"        "(cd skelly-admin && bun run build)"
     ;;
   site)
     check "cloned into skelly-site/"         "[ -d skelly-site/src ]"
     check "history is the user's"            "[ \"\$(git -C skelly-site rev-list --count HEAD)\" = 1 ]"
     check "placeholder hero copy replaced"   "! grep -q 'Hero Section' skelly-site/src/routes/home.tsx"
     check "social-proof above pricing"       "[ \"\$(grep -n 'social-proof' skelly-site/src/routes/home.tsx | head -1 | cut -d: -f1)\" -lt \"\$(grep -n '\"pricing\"' skelly-site/src/routes/home.tsx | head -1 | cut -d: -f1)\" ]"
-    check "build passes (typechecks)"        "cd skelly-site && bun run build"
+    check "build passes (typechecks)"        "(cd skelly-site && bun run build)"
     ;;
 esac
 
